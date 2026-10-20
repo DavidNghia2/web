@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Happy Vietnamese Women's Day 20/10 🌷</title>
+  <meta name="description" content="Trang web chúc mừng 20/10 cá nhân hóa dành tặng hội chị em phụ nữ">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%200%22%20100%22%20100%22><text y=%22.9em%22 font-size=%2290%22>🌷</text></svg>">
+
+  <!-- Google Fonts: Dancing Script, Plus Jakarta Sans, Caveat (Polaroid handwritten) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas vũ trụ sao đêm lấp lánh (Night Sky Stars) -->
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- Canvas cánh hoa bay nhẹ nhàng trên màn hình (Floating Petals) -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- ======================================================== -->
+  <!-- MÀN HÌNH KHÓA: NHẬP MẬT MÃ NGÀY SINH (LOCK SCREEN)       -->
+  <!-- ======================================================== -->
+  <div id="lock-screen" class="lock-screen-overlay" role="dialog" aria-modal="true">
+    <div class="lock-card">
+      <div class="lock-sprout-avatar">
+        <!-- SVG Mầm cây phát sáng đáng yêu -->
+        <svg class="lock-sprout-svg" viewBox="0 0 160 180" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="lockGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g class="sprout-head-leaf">
+            <path d="M 80,55 Q 75,20 48,15 Q 70,5 80,25 Q 90,5 112,15 Q 85,20 80,55" fill="#6ee7b7" stroke="#34d399" stroke-width="3" filter="url(#lockGlow)"/>
+            <circle cx="80" cy="18" r="5" fill="#fde047" filter="url(#lockGlow)"/>
+          </g>
+          <ellipse cx="80" cy="105" rx="52" ry="55" fill="rgba(244, 114, 182, 0.25)" stroke="#f472b6" stroke-width="4.5" filter="url(#lockGlow)"/>
+          <g class="sprout-eyes">
+            <circle cx="62" cy="98" r="5.5" fill="#ffffff"/>
+            <circle cx="98" cy="98" r="5.5" fill="#ffffff"/>
+            <circle cx="64" cy="97" r="2.2" fill="#0f172a"/>
+            <circle cx="100" cy="97" r="2.2" fill="#0f172a"/>
+          </g>
+          <ellipse cx="50" cy="110" rx="7" ry="4.5" fill="#ff758c" opacity="0.85" filter="url(#lockGlow)"/>
+          <ellipse cx="110" cy="110" rx="7" ry="4.5" fill="#ff758c" opacity="0.85" filter="url(#lockGlow)"/>
+          <path d="M 73,110 Q 80,120 87,110" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+
+      <h1 class="lock-title neon-text-pink">A Special Gift For You 🌷</h1>
+      <p class="lock-subtext">Một món quà nhỏ đang chờ bạn khám phá...</p>
+
+      <form id="lock-form" class="lock-form" onsubmit="return false;">
+        <div class="lock-input-group">
+          <input 
+            type="password" 
+            id="pass-input" 
+            class="lock-input" 
+            maxlength="6" 
+            pattern="[0-9]*" 
+            inputmode="numeric" 
+            placeholder="••••••" 
+            autocomplete="off" 
+            aria-label="Nhập mật mã ngày sinh gồm 6 chữ số"
+          >
+          <button type="button" id="btn-toggle-pass-visibility" class="btn-toggle-eye" title="Xem / Ẩn số" aria-label="Xem mật mã">👁️</button>
+        </div>
+
+        <button type="submit" id="btn-unlock" class="neon-action-btn lock-btn pulse-glow">
+          <span class="btn-text">Mở món quà 🎁</span>
+        </button>
+
+        <p class="lock-hint">
+          <span class="hint-icon">💡</span> Gợi ý: Mật mã là ngày tháng năm sinh của bạn (DDMMYY)
+        </p>
+
+        <div id="lock-error-msg" class="lock-error-msg" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MÀN HÌNH CHUYỂN CẢNH ĐIỆN ẢNH (CINEMATIC UNLOCK STAGE)   -->
+  <!-- ======================================================== -->
+  <div id="cinematic-overlay" class="cinematic-overlay" aria-hidden="true">
+    <canvas id="cinematic-canvas"></canvas>
+    
+    <div class="cinematic-content">
+      <!-- Bông hoa nở bung ở giữa màn hình -->
+      <div id="cinematic-flower" class="cinematic-flower">
+        <svg class="giant-flower-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="flowerCenterGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff" />
+              <stop offset="60%" stop-color="#fde047" />
+              <stop offset="100%" stop-color="#f59e0b" />
+            </radialGradient>
+            <linearGradient id="petalGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f472b6" />
+              <stop offset="100%" stop-color="#ff0844" />
+            </linearGradient>
+            <linearGradient id="petalGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c084fc" />
+              <stop offset="100%" stop-color="#ff758c" />
+            </linearGradient>
+          </defs>
+          <g transform="translate(150, 150)" class="blooming-petals-group">
+            <ellipse class="c-petal p1" cx="0" cy="-75" rx="25" ry="55" fill="url(#petalGrad1)" opacity="0.95"/>
+            <ellipse class="c-petal p2" cx="0" cy="-75" rx="25" ry="55" transform="rotate(30)" fill="url(#petalGrad2)" opacity="0.95"/>
+            <ellipse class="c-petal p3" cx="0" cy="-75" rx="25" ry="55" transform="rotate(60)" fill="url(#petalGrad1)" opacity="0.95"/>
+            <ellipse class="c-petal p4" cx="0" cy="-75" rx="25" ry="55" transform="rotate(90)" fill="url(#petalGrad2)" opacity="0.95"/>
+            <ellipse class="c-petal p5" cx="0" cy="-75" rx="25" ry="55" transform="rotate(120)" fill="url(#petalGrad1)" opacity="0.95"/>
+            <ellipse class="c-petal p6" cx="0" cy="-75" rx="25" ry="55" transform="rotate(150)" fill="url(#petalGrad2)" opacity="0.95"/>
+            <ellipse class="c-petal p7" cx="0" cy="-75" rx="25" ry="55" transform="rotate(180)" fill="url(#petalGrad1)" opacity="0.95"/>
+            <ellipse class="c-petal p8" cx="0" cy="-75" rx="25" ry="55" transform="rotate(210)" fill="url(#petalGrad2)" opacity="0.95"/>
+            <ellipse class="c-petal p9" cx="0" cy="-75" rx="25" ry="55" transform="rotate(240)" fill="url(#petalGrad1)" opacity="0.95"/>
+            <ellipse class="c-petal p10" cx="0" cy="-75" rx="25" ry="55" transform="rotate(270)" fill="url(#petalGrad2)" opacity="0.95"/>
+            <ellipse class="c-petal p11" cx="0" cy="-75" rx="25" ry="55" transform="rotate(300)" fill="url(#petalGrad1)" opacity="0.95"/>
+            <ellipse class="c-petal p12" cx="0" cy="-75" rx="25" ry="55" transform="rotate(330)" fill="url(#petalGrad2)" opacity="0.95"/>
+            <circle r="36" fill="url(#flowerCenterGrad)" filter="drop-shadow(0 0 15px #fde047)"/>
+            <circle r="18" fill="#ffffff" opacity="0.75"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Lời chào cá nhân hóa phát sáng -->
+      <div id="cinematic-greeting-box" class="cinematic-greeting-box">
+        <h2 id="cinematic-name-title" class="cinematic-name-title neon-text-mint"></h2>
+        <p id="cinematic-wish-sub" class="cinematic-wish-sub neon-text-pink"></p>
+      </div>
+
+      <button id="btn-skip-cinematic" class="btn-skip-cinematic" title="Chuyển vào trang chính">Bỏ qua ⏩</button>
+    </div>
+  </div>
+
+  <!-- Thanh điều khiển trên cùng: Tên người nhận & Nút bật nhạc & Nút Khóa lại -->
+  <header class="app-header">
+    <div class="header-left">
+      <span class="header-sprout-icon">🌱</span>
+      <span id="nav-group-name" class="header-group-name">Hội Chị Em</span>
+    </div>
+    <div class="header-right">
+      <button id="btn-relock" class="header-relock-btn" title="Khóa lại màn hình" aria-label="Khóa lại">
+        <span class="lock-icon">🔒</span>
+        <span class="lock-label">Khóa lại</span>
+      </button>
+      <button id="music-toggle-btn" class="header-music-btn" title="Bật / Tắt giai điệu yêu thương" aria-label="Bật tắt nhạc">
+        <span class="music-icon-anim">🎵</span>
+        <span id="music-btn-label" class="music-label">Giai điệu</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Trình phát nhạc Audio cục bộ (HTML5 Audio) -->
+  <audio id="local-audio-player" preload="auto"></audio>
+
+  <!-- YouTube Hidden Player Container -->
+  <div id="yt-player-wrap" class="yt-player-hidden" aria-hidden="true">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- Toast thông báo nhạc nếu cần kích hoạt thủ công -->
+  <div id="music-toast" class="music-toast" aria-live="polite">
+    <span class="toast-icon">🎵</span>
+    <span id="toast-msg">Giai điệu 20/10 đã sẵn sàng!</span>
+    <button id="btn-toast-action" class="btn-toast-action">Bật nhạc 🎵</button>
+  </div>
+
+  <!-- Thanh tiến trình màn hình (Screen Stepper Indicator) -->
+  <nav class="screen-stepper" aria-label="Điều hướng màn hình">
+    <div class="step-dot active" data-screen="1" title="Chào mừng"><span>1</span></div>
+    <div class="step-line"></div>
+    <div class="step-dot" data-screen="2" title="Vườn hoa kỳ diệu"><span>2</span></div>
+    <div class="step-line"></div>
+    <div class="step-dot" data-screen="3" title="Lời chúc yêu thương"><span>3</span></div>
+    <div class="step-line"></div>
+    <div class="step-dot" data-screen="4" title="Kỷ niệm chúng mình"><span>4</span></div>
+    <div class="step-line"></div>
+    <div class="step-dot" data-screen="5" title="Lời kết & Trái tim"><span>5</span></div>
+  </nav>
+
+  <!-- Vùng chứa các màn hình chính (Screens Container) -->
+  <main class="screens-wrapper">
+
+    <!-- ======================================================== -->
+    <!-- MÀN HÌNH 1: WELCOME (MẦM CÂY NEON & SAO ĐÊM)              -->
+    <!-- ======================================================== -->
+    <section id="screen-1" class="screen-panel screen-welcome active">
+      <div class="screen-content">
+        <!-- Huy hiệu chào mừng -->
+        <div class="neon-pill-badge" id="welcome-badge"></div>
+
+        <!-- Tiêu đề lớn & ngày 20/10 phát sáng neon -->
+        <h1 class="welcome-headline neon-text-pink" id="welcome-headline"></h1>
+        
+        <div class="date-glow-box">
+          <span class="date-glow-text neon-text-mint" id="welcome-date"></span>
+        </div>
+
+        <p class="welcome-subtext" id="welcome-subtext"></p>
+
+        <!-- Nhân vật meme chào đón thay thế hai nhân vật hoạt hình -->
+        <div class="neon-sprouts-stage welcome-stage welcome-meme-stage">
+          <div class="welcome-meme-wrapper" id="welcome-meme-wrapper">
+            <img src="images/meme.png" alt="Meme 20/10" class="welcome-meme-img" id="welcome-meme-img" />
+          </div>
+        </div>
+
+        <!-- Nút khám phá món quà -->
+        <div class="welcome-actions">
+          <button id="btn-explore-gift" class="neon-action-btn pulse-glow">
+            <span class="btn-text" id="welcome-btn-text">Khám phá món quà 🌷</span>
+            <span class="btn-sparkle">✨</span>
+          </button>
+        </div>
+
+        <div class="scroll-down-hint">
+          <span class="hint-mouse"></span>
+          <span id="welcome-scroll-hint" class="hint-text">Bấm nút hoặc cuộn xuống để tiếp tục</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- MÀN HÌNH 2: MAGICAL FLOWER GARDEN (KHU VƯỜN KỲ DIỆU)     -->
+    <!-- ======================================================== -->
+    <section id="screen-2" class="screen-panel screen-garden">
+      <div class="screen-content">
+        <div class="neon-pill-badge" id="garden-badge"></div>
+        <h2 class="section-title neon-text-mint" id="garden-heading"></h2>
+
+        <div class="garden-quotes-box">
+          <p class="garden-quote-line-1" id="garden-quote-1"></p>
+          <p class="garden-quote-line-2 neon-text-pink" id="garden-quote-2"></p>
+        </div>
+
+        <p class="garden-hint-text" id="garden-hint"></p>
+
+        <!-- Sân khấu khu vườn kỳ diệu với hoa nở tương tác -->
+        <div class="garden-interactive-stage" id="garden-stage">
+          <div class="garden-glowing-ground"></div>
+
+          <div class="sprout-gardener-character" id="sprout-gardener">
+            <svg class="neon-sprout-svg sprout-gardener-svg" viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
+              <g class="sprout-head-leaf mint-leaves">
+                <path d="M 80,65 Q 75,30 50,22 Q 70,12 80,35 Q 90,12 110,22 Q 85,30 80,65" fill="#6ee7b7" stroke="#34d399" stroke-width="3" filter="url(#mintGlow)"/>
+                <path d="M 80,35 Q 75,48 80,65" stroke="#10b981" stroke-width="2.5" fill="none"/>
+              </g>
+              <ellipse cx="80" cy="120" rx="55" ry="60" fill="rgba(110, 231, 183, 0.28)" stroke="#6ee7b7" stroke-width="5" filter="url(#mintGlow)"/>
+              <g class="sprout-eyes">
+                <circle cx="62" cy="112" r="6" fill="#ffffff"/>
+                <circle cx="98" cy="112" r="6" fill="#ffffff"/>
+                <circle cx="64" cy="110" r="2.5" fill="#0f172a"/>
+                <circle cx="100" cy="110" r="2.5" fill="#0f172a"/>
+              </g>
+              <ellipse cx="50" cy="125" rx="8" ry="5" fill="#f472b6" opacity="0.8" filter="url(#mintGlow)"/>
+              <ellipse cx="110" cy="125" rx="8" ry="5" fill="#f472b6" opacity="0.8" filter="url(#mintGlow)"/>
+              <path d="M 72,126 Q 80,136 88,126" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+              <path class="sprout-arm-right" d="M 128,125 Q 148,110 145,90" stroke="#6ee7b7" stroke-width="4.5" stroke-linecap="round" fill="none" filter="url(#mintGlow)"/>
+              <g transform="translate(145, 85)" class="magic-wand-star">
+                <circle r="7" fill="#fde047" filter="url(#mintGlow)"/>
+                <path d="M -10,0 L 10,0 M 0,-10 L 0,10" stroke="#ffffff" stroke-width="2"/>
+              </g>
+            </svg>
+            <div class="sprout-speech-bubble" id="sprout-speech">Chạm vào tôi hoặc khu vườn nè! 🌸</div>
+          </div>
+
+          <div class="blooming-flowers-grid" id="blooming-flowers-container"></div>
+        </div>
+
+        <!-- Nút sang màn hình 3 -->
+        <div class="garden-actions">
+          <button id="btn-goto-wishes" class="neon-action-btn">
+            <span class="btn-text" id="garden-btn-text">Xem những lời chúc yêu thương 💌</span>
+            <span class="btn-sparkle">💖</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- MÀN HÌNH 3: SPECIAL WISHES (LỜI CHÚC XUẤT HIỆN LẦN LƯỢT)  -->
+    <!-- ======================================================== -->
+    <section id="screen-3" class="screen-panel screen-wishes">
+      <div class="screen-content">
+        <div class="neon-pill-badge" id="wishes-badge"></div>
+        <h2 class="section-title neon-text-pink" id="wishes-heading"></h2>
+
+        <!-- Trình phát nhạc Cute Pastel dành riêng cho từng người -->
+        <div id="screen3-music-player" class="cute-music-player-card" role="region" aria-label="Giai điệu dành riêng cho bạn">
+          <div class="player-left-col">
+            <div class="player-disc-wrap">
+              <div class="player-vinyl" id="player-vinyl">
+                <span id="player-disc-icon" class="vinyl-center-dot">🌸</span>
+              </div>
+            </div>
+            <div class="player-meta">
+              <div class="player-badge-row">
+                <span class="player-dedicated-tag" id="player-dedicated-tag">🎧 Giai điệu dành riêng</span>
+                <span class="player-soundwave" id="player-soundwave">
+                  <span></span><span></span><span></span><span></span>
+                </span>
+              </div>
+              <div class="player-title" id="player-song-title">Đang tải giai điệu...</div>
+              <div class="player-artist" id="player-song-artist">Nghệ sĩ</div>
+            </div>
+          </div>
+          <div class="player-right-col">
+            <button id="btn-player-play" class="btn-cute-play" aria-label="Phát hoặc tạm dừng nhạc" title="Phát / Tạm dừng">
+              <span id="player-play-icon" class="player-play-icon">▶</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="wishes-board" id="wishes-board">
+          <div class="wishes-list" id="wishes-list"></div>
+
+          <div class="wishes-sprout-cheerer">
+            <div class="cheerer-bubble">Yêu thương gửi trọn tới các chị em! 💕</div>
+            <div class="cheerer-avatar">🌱</div>
+          </div>
+        </div>
+
+        <div class="wishes-actions">
+          <button id="btn-goto-memories" class="neon-action-btn">
+            <span class="btn-text" id="wishes-btn-text">Xem lại kỷ niệm chúng mình 📸</span>
+            <span class="btn-sparkle">📸</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- MÀN HÌNH 4: OUR MEMORIES (ALBUM ẢNH POLAROID)            -->
+    <!-- ======================================================== -->
+    <section id="screen-4" class="screen-panel screen-memories">
+      <div class="screen-content">
+        <div class="neon-pill-badge" id="memories-badge"></div>
+        <h2 class="section-title neon-text-mint" id="memories-heading"></h2>
+        <p class="memories-description" id="memories-description"></p>
+
+        <div class="polaroid-gallery" id="polaroid-gallery"></div>
+
+        <div class="memories-actions">
+          <button id="btn-goto-ending" class="neon-action-btn pulse-glow">
+            <span class="btn-text" id="memories-btn-text">Gửi gắm lời chúc cuối cùng 💌</span>
+            <span class="btn-sparkle">🌷</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- MÀN HÌNH 5: ENDING (TRÁI TIM CÁNH HOA BAY LÊN)           -->
+    <!-- ======================================================== -->
+    <section id="screen-5" class="screen-panel screen-ending">
+      <canvas id="heart-canvas"></canvas>
+
+      <div class="screen-content ending-content">
+        <div class="neon-pill-badge" id="ending-badge"></div>
+
+        <h2 class="ending-title neon-text-pink" id="ending-title">Happy Women's Day 20/10 🌷</h2>
+
+        <div class="ending-thankyou-card">
+          <div class="card-glow-border"></div>
+          <p class="ending-thankyou-text" id="ending-thankyou"></p>
+          <p class="ending-wishes-text neon-text-mint" id="ending-wishes"></p>
+        </div>
+
+        <div class="ending-sprouts-hug">
+          <span class="sprout-dance sprout-left">🌱</span>
+          <span class="heart-pulse-icon">💖</span>
+          <span class="sprout-dance sprout-right">🌸</span>
+        </div>
+
+        <div class="ending-actions">
+          <button id="btn-random-wish" class="neon-action-btn btn-random-wish">
+            <span class="btn-text" id="ending-random-btn-text">Nhận thêm một lời chúc 🎁</span>
+            <span class="btn-sparkle">🎁</span>
+          </button>
+          <button id="btn-replay" class="neon-secondary-btn">
+            <span class="btn-text" id="ending-replay-btn-text">Xem lại từ đầu ✨</span>
+            <span class="btn-icon">↺</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL PHÓNG TO ẢNH POLAROID (LIGHTBOX)                   -->
+  <!-- ======================================================== -->
+  <div id="polaroid-lightbox" class="polaroid-lightbox" aria-hidden="true" role="dialog">
+    <div class="lightbox-overlay"></div>
+    <div class="lightbox-card">
+      <button id="close-lightbox-btn" class="lightbox-close" aria-label="Đóng">&times;</button>
+      <div class="lightbox-tape"></div>
+      <div class="lightbox-image-wrap">
+        <img id="lightbox-img" src="" alt="Kỷ niệm phóng to">
+      </div>
+      <div class="lightbox-details">
+        <p id="lightbox-caption" class="lightbox-caption"></p>
+        <span id="lightbox-date" class="lightbox-date"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL LỜI CHÚC BẤT NGỜ NGẪU NHIÊN                        -->
+  <!-- ======================================================== -->
+  <div id="random-wish-modal" class="random-wish-modal" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop"></div>
+    <div class="random-wish-card">
+      <button id="close-random-wish-btn" class="random-wish-close" aria-label="Đóng">&times;</button>
+      <div class="random-wish-header">
+        <span class="modal-sparkle-icon">✨</span>
+        <h3 class="modal-headline">Món Quà Bất Ngờ Dành Riêng Cho Bạn!</h3>
+      </div>
+      <div class="random-wish-body">
+        <div id="random-wish-text" class="random-wish-text"></div>
+      </div>
+      <div class="random-wish-footer">
+        <button id="btn-draw-another-wish" class="neon-action-btn btn-small">
+          <span>Rút thêm lời chúc khác 🥠</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame Player API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- Nạp dữ liệu 8 người nhận cá nhân hóa -->
+  <script src="recipients.js"></script>
+  <!-- Nạp file cấu hình chung -->
+  <script src="config.js"></script>
+  <!-- Nạp file logic tương tác chính -->
+  <script src="script.js"></script>
+</body>
+</html>
